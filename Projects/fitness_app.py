@@ -19,6 +19,7 @@ def menu():
     print('3. Check BMR ')
     print('4. Daily Calorie Consumption Expectation ' )
     print('5. Check Targeted Daily Calorie Consumption Expectation ')
+    print('6. Body Statistics Report ')
 
 def check_bmr(gender, weight, height, age):
     bmr = 0.0
@@ -29,12 +30,28 @@ def check_bmr(gender, weight, height, age):
     return bmr
 
 def check_bmi(weight, height):
-    return float(weight/((height/100)*(height/100)))
+    return float(weight/((height/100)**2))
 
 def check_tdee(bmr, lifestyle_type):
-    return float(bmr * lifestyle_type)
+    activity_multipliers = {
+        'sedentary' : 1.2,
+        'lightly active' : 1.375,
+        'moderately active' : 1.55,
+        'very active' : 1.725,
+        'extra active' : 1.9
+    }
+    return bmr * activity_multipliers[lifestyle_type.lower()]
 
-def startup():
+def check_daily_calories(gender, age, height, weight, target_weight, target_timeframe, lifestyle_type):
+    bmr = check_bmr(gender, weight, height, age)
+    tdee = check_tdee(bmr, lifestyle_type)
+    weight_difference = weight - target_weight
+    total_calorie_deficit = weight_difference * 7700
+    daily_calorie_deficit = float(total_calorie_deficit / target_timeframe)
+    
+    return tdee - daily_calorie_deficit
+
+def main():
     print('Welcom to Fitness Journey!')
     name = input('Please enter your name - ')
     gender = input('What\'s your gender(M-Male/F-Female)? ')
@@ -45,7 +62,9 @@ def startup():
     target_timeframe = int(input('What\'s timeframe you are looking for to achieve the target (in days)? - '))
     lifestyle_type = input('What\'s your lifestyle type (Sedentary, Lightly Active, Moderately Active, Very Active, Extra Active)? - ')
     choice = 0
-    while choice != 5:
+    while True:
+        menu()
+        choice = int(input('Please enter your choice - '))
         if choice == 1:
             print('Your BMI is {}'.format(check_bmi(age, height)))
         elif choice == 2:
@@ -64,8 +83,34 @@ def startup():
             bmr = check_bmr(gender, weight, height, age)
             print('Your BMR is {}'.format(bmr))
         elif choice == 4:
-            tdee = check_tdee(check_bmr(gender, weight, height, age) * lifestyle_type)
+            tdee = check_tdee(check_bmr(gender, weight, height, age), lifestyle_type)
             print('Your Daily Calorie Consumption Expectation is {}'.format(tdee))
+        elif choice == 5:
+            target_daily_calories = check_daily_calories(gender, age, height, weight, target_weight, target_timeframe, lifestyle_type)
+            print('Your targeted Daily Calorie Consumption will be {}'.format(target_daily_calories))
+        elif choice == 6:
+            bmr = check_bmr(gender, weight, height, age)
+            tdee = check_tdee(bmr, lifestyle_type)
+            daily_calories = check_daily_calories(gender, age, height, weight, target_weight, target_timeframe, lifestyle_type)
+            report = f"""
+            Body Statistics Report
+            ----------------------
+            Name - {name}
+            Age - {age} Years
+            Gender - {gender}
+            Current Weight - {weight} Kg
+            Target Weight - {target_weight} Kg
+            Height - {height} cm
+            Activity Level - {lifestyle_type}
+            Target Timeframe - {target_timeframe} Days
+            ---||||||||||---------|||||||||||--------
+            Basal Metabolic Report (BMR) - {bmr: .2f} CAL/Day
+            Total Daily Energy Expenditure (TDEE) - {tdee: .2f} CAL/Day
+            Daily Calorie Intake to reach Target Weight - {daily_calories: .2f} CAL/Day
+            """
+            print(report)
+        else:
+            print('Invalid Option! Please Try Again!')
         
-        menu()
-        choice = int(input('Please enter your choice - '))
+if __name__ == "__main__":
+    main()
