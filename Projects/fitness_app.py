@@ -30,7 +30,8 @@ def check_bmr(gender, weight, height, age):
     return bmr
 
 def check_bmi(weight, height):
-    return float(weight/((height/100)**2))
+    h_in_mit = round(height/100)
+    return round(weight/ h_in_mit ** 2)
 
 def check_tdee(bmr, lifestyle_type):
     activity_multipliers = {
