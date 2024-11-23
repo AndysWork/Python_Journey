@@ -52,6 +52,13 @@ def check_daily_calories(gender, age, height, weight, target_weight, target_time
     
     return tdee - daily_calorie_deficit
 
+def use_again():
+    replay = input('Do you wnat to use the app again? Y/N')
+    if replay.lower() == 'y':
+        return True
+    else: 
+        return False
+
 def main():
     print('Welcom to Fitness Journey!')
     name = input('Please enter your name - ')
@@ -110,8 +117,8 @@ def main():
             Daily Calorie Intake to reach Target Weight - {daily_calories: .2f} CAL/Day
             """
             print(report)
-        else:
-            print('Invalid Option! Please Try Again!')
+        if not use_again:
+            break
         
 if __name__ == "__main__":
     main()
